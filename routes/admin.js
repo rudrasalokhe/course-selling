@@ -1,11 +1,14 @@
 const {Router, response} = require('express');
 const { model } = require('mongoose');
 const { adminModel } = require('../db');
+const jwt = require('jsonwebtoken');
 const adminRouter = Router();
+const {JWT_ADMIN_PASSWORD} = require('../config.js');
 
 adminRouter.post('/signup', async (req, res)=>{
     try{
         const {email, password, firstName, lastName} = req.body;
+        
         await adminModel.create({
                 email: email, 
                 password : password, 
@@ -29,7 +32,7 @@ adminRouter.post('/signin', async (req,res)=>{
             if(user){
                 const token =  jwt.sign({
                     id: user._id
-                }, JWT_USER_PASSWORD);
+                }, JWT_ADMIN_PASSWORD);
                 res.json({
                     token : token
                 })
@@ -43,8 +46,8 @@ adminRouter.post('/signin', async (req,res)=>{
             }
             catch(e){
                 console.log("error loginin", e);
+                res.status(500).json({ message: "Internal server error", error: error.message });
             }
-            res.status(500).json({ message: "Internal server error", error: error.message });
 })
 
 adminRouter.post('/course', (req, res)=>{
