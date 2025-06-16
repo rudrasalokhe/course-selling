@@ -6,7 +6,7 @@ const {JWT_USER_PASSWORD} = require('../config.js');
 
 router.post('/signup', async (req, res) => {
         try{
-        const {email, password, firstName, lastName} = req.body;
+        const {email, password, firstName, laastName} = req.body;
         await userModel.create({
             email: email, 
             password : password, 
@@ -18,7 +18,9 @@ router.post('/signup', async (req, res) => {
         catch(e){
             console.log("error during signup",e);
         }
-        res.status(500).json({ message: "Internal server error", error: error.message });
+        res.status(500).json({ 
+            message: "Internal server error", error: error.message 
+        });
         });
 
 router.post('/signin', async (req, res) => {

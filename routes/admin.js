@@ -4,7 +4,9 @@ const { adminModel } = require('../db');
 const jwt = require('jsonwebtoken');
 const adminRouter = Router();
 const {JWT_ADMIN_PASSWORD} = require('../config.js');
-
+const {adminMiddleware} = require('../middleware/admin.js');
+const admin = require('../middleware/admin.js');
+const {courseModel} = require('../db.js');
 adminRouter.post('/signup', async (req, res)=>{
     try{
         const {email, password, firstName, lastName} = req.body;
@@ -50,19 +52,53 @@ adminRouter.post('/signin', async (req,res)=>{
             }
 })
 
-adminRouter.post('/course', (req, res)=>{
+adminRouter.post('/course',adminMiddleware, async (req, res)=>{
+    try{
+        const adminId = req.body;
+        const {courseName, description, imageUrl} =  req.body;
+        const course = await courseModel.create({
+            title: String,
+            description: String,
+            price: Number,
+            imageUrl: String,
+            creatorId: ObjectId
+        })
+        res.json({
+            message : "Course added",
+            courseId : course._id
+        })
+    }
+    catch(e){
+        console.log("error while adding course", e);
+    }
+})
+adminRouter.put('/course', adminMiddleware, async (req, res)=>{
+    const adminId = req.userId;
+     const {title, description, imageUrl, price, courseId } = req.body;
+     const updated = await courseModel.updateOne({
+        _id : courseId, 
+        creatorId : adminId
+     },
+      {
+        title :  title, 
+        description :  description, 
+        imageUrl : imageUrl, 
+        price : price
+      }
+    )
     res.json({
-        message :  "all courses"
+        message :  "course updated", 
+        courseId : updated._id
     })
 })
-adminRouter.put('/course', (req, res)=>{
+adminRouter.get('/course/bulk',adminMiddleware, async (req,res)=>{
+    const adminId = req.body;
+    const courses = await courseModel.find({
+        creatorId :  ObjectId
+    });
     res.json({
-        message : "add courses"
-    })
-})
-adminRouter.get('/course/bulk', (req,res)=>{
-    res.json({
-        message : "something"
+        message : "Course updated",
+        courses
     })
 })
 
