@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const adminRouter = Router();
 const {JWT_ADMIN_PASSWORD} = require('../config.js');
 const {adminMiddleware} = require('../middleware/admin.js');
-const admin = require('../middleware/admin.js');
 const {courseModel} = require('../db.js');
 adminRouter.post('/signup', async (req, res)=>{
     try{
@@ -51,7 +50,6 @@ adminRouter.post('/signin', async (req,res)=>{
                 res.status(500).json({ message: "Internal server error", error: error.message });
             }
 })
-
 adminRouter.post('/course',adminMiddleware, async (req, res)=>{
     try{
         const adminId = req.body;
